@@ -29,11 +29,13 @@ public class DozeService extends Service {
     private static final boolean DEBUG = false;
 
     private ProximitySensor mProximitySensor;
+    private TiltSensor mTiltSensor;
 
     @Override
     public void onCreate() {
         if (DEBUG) Log.d(TAG, "Creating service");
         mProximitySensor = new ProximitySensor(this);
+        mTiltSensor = new TiltSensor(this);
 
         IntentFilter screenStateFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         screenStateFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -52,6 +54,7 @@ public class DozeService extends Service {
         super.onDestroy();
         this.unregisterReceiver(mScreenStateReceiver);
         mProximitySensor.disable();
+        mTiltSensor.disable();
     }
 
     @Override
@@ -61,11 +64,13 @@ public class DozeService extends Service {
 
     private void onDisplayOn() {
         if (DEBUG) Log.d(TAG, "Display on");
+        mTiltSensor.disable();
         mProximitySensor.disable();
     }
 
     private void onDisplayOff() {
         if (DEBUG) Log.d(TAG, "Display off");
+        mTiltSensor.enable();
         mProximitySensor.enable();
     }
 
